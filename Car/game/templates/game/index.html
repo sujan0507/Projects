@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Car Racing Game</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #151515;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00ff99;
+            margin: 15px;
+        }
+
+        #score {
+            font-size: 22px;
+            margin: 10px;
+        }
+
+        #road {
+            width: 320px;
+            height: 500px;
+            background: #444;
+            margin: 15px auto;
+            position: relative;
+            overflow: hidden;
+            border-left: 8px solid white;
+            border-right: 8px solid white;
+        }
+
+        .line {
+            position: absolute;
+            left: 50%;
+            width: 8px;
+            height: 60px;
+            background: white;
+            transform: translateX(-50%);
+        }
+
+        #player {
+            width: 45px;
+            height: 75px;
+            background: dodgerblue;
+            border: 3px solid white;
+            border-radius: 10px;
+            position: absolute;
+            bottom: 20px;
+            left: 125px;
+            font-size: 25px;
+        }
+
+        #enemy {
+            width: 45px;
+            height: 75px;
+            background: red;
+            border: 3px solid white;
+            border-radius: 10px;
+            position: absolute;
+            top: -90px;
+            left: 40px;
+            font-size: 25px;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: #00cc77;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            cursor: pointer;
+            margin: 8px;
+        }
+
+        button:hover {
+            background: #00ff99;
+        }
+
+        #message {
+            color: yellow;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🏎️ CAR RACING GAME</h1>
+
+<div id="score">Score: 0</div>
+
+<div id="road">
+    <div class="line" style="top: 50px;"></div>
+    <div class="line" style="top: 180px;"></div>
+    <div class="line" style="top: 310px;"></div>
+
+    <div id="player">🚗</div>
+    <div id="enemy">🚙</div>
+</div>
+
+<h3 id="message">Press START to play!</h3>
+
+<button onclick="startGame()">START GAME</button>
+
+<script>
+    const player = document.getElementById("player");
+    const enemy = document.getElementById("enemy");
+    const scoreText = document.getElementById("score");
+    const message = document.getElementById("message");
+
+    let playerX = 125;
+    let enemyX = 40;
+    let enemyY = -90;
+    let score = 0;
+    let running = false;
+    let gameLoop;
+
+    function movePlayer(event) {
+        if (!running) return;
+
+        if (event.key === "ArrowLeft") {
+            playerX = Math.max(0, playerX - 25);
+        }
+
+        if (event.key === "ArrowRight") {
+            playerX = Math.min(254, playerX + 25);
+        }
+
+        player.style.left = playerX + "px";
+    }
+
+    document.addEventListener("keydown", movePlayer);
+
+    function startGame() {
+        clearInterval(gameLoop);
+
+        playerX = 125;
+        enemyY = -90;
+        enemyX = Math.floor(Math.random() * 255);
+        score = 0;
+        running = true;
+
+        player.style.left = playerX + "px";
+        enemy.style.left = enemyX + "px";
+        enemy.style.top = enemyY + "px";
+
+        scoreText.innerText = "Score: 0";
+        message.innerText = "Avoid the enemy cars!";
+
+        gameLoop = setInterval(updateGame, 20);
+    }
+
+    function updateGame() {
+        enemyY += 5;
+
+        enemy.style.top = enemyY + "px";
+
+        if (enemyY > 500) {
+            enemyY = -90;
+            enemyX = Math.floor(Math.random() * 255);
+
+            score++;
+            scoreText.innerText = "Score: " + score;
+        }
+
+        // Collision detection
+        if (
+            enemyY + 75 > 405 &&
+            enemyY < 480 &&
+            playerX < enemyX + 45 &&
+            playerX + 45 > enemyX
+        ) {
+            endGame();
+        }
+    }
+
+    function endGame() {
+        running = false;
+        clearInterval(gameLoop);
+
+        message.innerText =
+            "GAME OVER! Your Score: " + score;
+    }
+</script>
+
+</body>
+</html>
